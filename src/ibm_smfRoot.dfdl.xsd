@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:fn="http://www.w3.org/2005/xpath-functions"
+  xmlns:dfdl="http://www.ogf.org/dfdl/dfdl-1.0/"
+  xmlns:ibm_smf='urn:io.github.dfdlschemas.ibm_smf.ibm_smf'
+  elementFormDefault="unqualified">
+
+  <!--
+  This file defines a root element for the data format.
+
+  You may not need to modify this file.
+  Rather, the details of the format are in the "ibm_smfType.dfdl.xsd" file.
+
+  Notice this element is in no namespace, which is recommended for
+  root elements in DFDL schemas. This keeps the DFDL schema compatible with
+  parsing data not only into XML, but into other representations like JSON which don't
+  have namespaces.
+
+  Use of this root element is entirely optional.
+
+  Tests built into the schema project will use this root element.
+  However, users can use this root element, or use the schema as a library by
+  defining their own local or global element and using the top level complex type for
+  the format in the "ibm_smfType.dfdl.xsd" file, just as
+  this root element does.
+
+  It is recommended that top-level root element(s) are in no namespace
+  and contain only a type reference to a complex type defined in the
+  schema's namespace. That is, they are _one-line_ element declarations.
+  -->
+  <xs:import
+    namespace='urn:io.github.dfdlschemas.ibm_smf.ibm_smf'
+    schemaLocation='ibm_smfType.dfdl.xsd' />
+
+  <xs:annotation>
+    <xs:appinfo source="http://www.ogf.org/dfdl/">
+      <dfdl:format ref='ibm_smf:ibm_smfBaseFormat' />
+    </xs:appinfo>
+  </xs:annotation>
+
+  <xs:element name='ibm_smf' type='ibm_smf:ibm_smfType' />
+
+  <!--
+  If you need more root elements just for testing, don't add them here,
+  Add them in the test resources directory so they won't be part of the
+  final DFDL schema
+  -->
+
+</xs:schema>

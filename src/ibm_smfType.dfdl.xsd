@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema
+  xmlns="http://www.w3.org/2001/XMLSchema"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:fn="http://www.w3.org/2005/xpath-functions"
+  xmlns:dfdl="http://www.ogf.org/dfdl/dfdl-1.0/"
+  xmlns:ibm_smf="urn:io.github.dfdlschemas.ibm_smf.ibm_smf"
+  targetNamespace="urn:io.github.dfdlschemas.ibm_smf.ibm_smf"
+  elementFormDefault="unqualified">
+
+  <!--
+   This file contains the definition of the Ibm_smf data format.
+   -->
+
+  <include schemaLocation="ibm_smfBaseFormat.dfdl.xsd" />
+
+  <annotation>
+    <appinfo source="http://www.ogf.org/dfdl/">
+      <dfdl:format ref="ibm_smf:ibm_smfBaseFormat" />
+    </appinfo>
+  </annotation>
+
+  <complexType name="ibm_smfType">
+    <sequence>
+
+    </sequence>
+  </complexType>
+
+  <!--
+  Note that this file and other files of this schema should not
+  define global elements except for test purposes under the test
+  resources directory.
+
+  Rather only simple or complex types and
+  groups should be defined.
+
+  This helps keep the DFDL schema usable not only to create XML
+  from parsing, but usable to parse data to JSON and other
+  formats that do not have namespaces.
+  -->
+
+</schema>

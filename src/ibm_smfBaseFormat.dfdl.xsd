@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<schema
+  xmlns="http://www.w3.org/2001/XMLSchema"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:fn="http://www.w3.org/2005/xpath-functions"
+  xmlns:dfdl="http://www.ogf.org/dfdl/dfdl-1.0/"
+  xmlns:ibm_smf="urn:io.github.dfdlschemas.ibm_smf.ibm_smf"
+  targetNamespace="urn:io.github.dfdlschemas.ibm_smf.ibm_smf"
+  elementFormDefault="unqualified">
+
+  <include schemaLocation="/org/apache/daffodil/xsd/DFDLGeneralFormat.dfdl.xsd" />
+
+  <!--
+  This file defines a base format for use by all the schema files of this format.
+
+  Most real DFDL schemas will expand past a single file just to make editing
+  easier and organize the parts of the schema. So it is easiest to start off
+  right away with a separate file for the base format.
+  -->
+  <annotation>
+    <appinfo source="http://www.ogf.org/dfdl/">
+      <dfdl:defineFormat name="ibm_smfBaseFormat">
+        <!--
+        Place the basic DFDL properties shared by the format below.
+
+        This makes it easy to share them as your format grows into
+        multiple files of DFDL.
+
+        Note on syntax: DFDL properties placed inside a dfdl:format
+        element do not (and cannot have) a "dfdl:" prefix.
+
+        Some properties may be the same as in the GeneralFormat.
+        If they are important properties for the format it is
+        best to list them here anyway. The fallback to GeneralFormat is
+        really to avoid having to mention properties that aren't
+        relevant to the format, but which Daffodil requires anyway.
+        -->
+        <dfdl:format
+          ref="ibm_smf:GeneralFormat"
+        />
+      </dfdl:defineFormat>
+    </appinfo>
+  </annotation>
+
+</schema>
