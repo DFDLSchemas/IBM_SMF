@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+  <!-- ******************************************************************
+	*
+	* Version 1.0 	SMF-Header.xsd
+	*
+	* © 2025 Steve Hanson <smhdfdl@gmail.com>
+	*
+	* This DFDL schema models a file of z/OS SMF binary records.
+	* 
+	******************************************************************* -->
+	
+<xs:schema targetNamespace="http://www.ibm.com/dfdl/SMF"
+  xmlns:dfdl="http://www.ogf.org/dfdl/dfdl-1.0/" 
+  xmlns:fmt="http://www.ibm.com/dfdl/SMFFormat" 
+  xmlns:fn="http://www.w3.org/2005/xpath-functions" 
+  xmlns:ibmDfdlExtn="http://www.ibm.com/dfdl/extensions" 
+  xmlns:ibmSchExtn="http://www.ibm.com/schema/extensions" 
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:smf="http://www.ibm.com/dfdl/SMF">
+  
+  <xs:import namespace="http://www.ibm.com/dfdl/SMFFormat" schemaLocation="SMF-Format.xsd"/>
+  
+  <xs:element name="SMFFile" dfdl:lengthKind="implicit" ibmSchExtn:docRoot="true">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="smf:SMFRecord" minOccurs="0" maxOccurs="unbounded" dfdl:occursCountKind="parsed"></xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="SMFHeader" dfdl:lengthKind="implicit">
+  <xs:complexType>
+    <xs:sequence>
+      <!--  Model the record length as a prefixed length instead -->
+      <!--  <xs:element dfdl:length="2" name="SMFHDR_Len" type="xs:nonNegativeInteger"/> -->
+      <xs:element dfdl:length="2" name="SMFHDR_Seg" type="xs:hexBinary" default="00"/>
+      <xs:element dfdl:lengthKind="implicit" name="SMFHDR_Flag">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element dfdl:length="1" dfdl:lengthUnits="bits" dfdl:alignmentUnits="bits" name="SMFHDR_Flag0" type="xs:boolean" default="false"/>
+            <xs:element dfdl:length="1" dfdl:lengthUnits="bits" dfdl:alignmentUnits="bits" name="SMFHDR_Flag1" type="xs:unsignedByte"/>
+			<xs:element dfdl:length="1" dfdl:lengthUnits="bits" dfdl:alignmentUnits="bits" name="SMFHDR_Flag2" type="xs:unsignedByte"/>
+			<xs:element dfdl:length="1" dfdl:lengthUnits="bits" dfdl:alignmentUnits="bits" name="SMFHDR_Flag3" type="xs:boolean"/>
+            <xs:element dfdl:length="1" dfdl:lengthUnits="bits" dfdl:alignmentUnits="bits" name="SMFHDR_Flag4" type="xs:boolean"/>
+            <xs:element dfdl:length="1" dfdl:lengthUnits="bits" dfdl:alignmentUnits="bits" name="SMFHDR_Flag5" type="xs:boolean"/>
+            <xs:element dfdl:length="1" dfdl:lengthUnits="bits" dfdl:alignmentUnits="bits" name="SMFHDR_Flag6" type="xs:boolean"/>
+            <xs:element dfdl:length="1" dfdl:lengthUnits="bits" dfdl:alignmentUnits="bits" name="SMFHDR_Flag7" type="xs:boolean" default="false"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element dfdl:length="1" name="SMFHDR_Rty" type="xs:unsignedByte"/>
+      <xs:element dfdl:length="4" name="SMFHDR_Time" type="xs:unsignedInt"/>
+      <xs:element dfdl:length="4" name="SMFHDR_Date" type="xs:hexBinary"/>
+      <xs:element dfdl:length="4" name="SMFHDR_SID" type="xs:string"/>
+      <!-- Since type 84 record sets SMFHDR_Flag1 but locates the SMFHDR_STP field in a non-standard position, force such a record to omit the SMFHDR_Subtype -->
+      <xs:element name="SMFHDR_Subtype" dfdl:lengthKind="implicit" minOccurs="0" maxOccurs="1" dfdl:occursCountKind="expression" dfdl:occursCount="{if (../SMFHDR_Flag/SMFHDR_Flag1 and ../SMFHDR_Rty ne 84) then 1 else 0}">
+        <xs:complexType>
+          <xs:sequence>
+		      <xs:element dfdl:length="4" name="SMFHDR_WID" type="xs:string" nillable="true" dfdl:nilValue="%NUL;%NUL;%NUL;%NUL;"/>
+		      <xs:element dfdl:length="2" ibmDfdlExtn:sampleValue="0" name="SMFHDR_STP" type="xs:unsignedShort"/>
+          </xs:sequence>      
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="SMFHDR_Extension1" dfdl:lengthKind="implicit" minOccurs="0" maxOccurs="1" dfdl:occursCountKind="expression" dfdl:occursCount="{../SMFHDR_Flag/SMFHDR_Flag2}">
+        <xs:complexType>
+          <xs:sequence>
+		    <xs:element dfdl:length="2" name="SMFHDR1_Ext_Len" type="xs:unsignedShort" fixed="32"/>
+		    <xs:element dfdl:length="1" name="SMFHDR1_VERSION" type="xs:unsignedByte" fixed="1"/>
+            <xs:element dfdl:lengthKind="implicit" name="SMFHDR1_Flag">
+		      <xs:complexType>
+		        <xs:sequence>
+		          <xs:element dfdl:length="1" dfdl:lengthUnits="bits" dfdl:alignmentUnits="bits" name="SMFHDR1_Flag0" type="xs:boolean"/>
+                  <xs:element dfdl:length="1" dfdl:lengthUnits="bits" dfdl:alignmentUnits="bits" name="SMFHDR1_Flags1to7" type="xs:unsignedByte" default="0"/>
+          		</xs:sequence>
+        	  </xs:complexType>
+		    </xs:element>
+		    <xs:element dfdl:length="16" name="SMFHDR1_STCKE" type="xs:hexBinary"/>
+		    <xs:element dfdl:length="8" name="SMFHDR1_TZO" type="xs:long"/>
+		    <xs:element dfdl:length="2" name="SMFHDR1_EXT_RTY" type="xs:unsignedShort"/>
+		    <xs:element dfdl:length="2" name="SMFHDR1_Reserved" type="xs:hexBinary" default="00"/>
+          </xs:sequence>      
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  </xs:element>
+
+  <xs:element name="SMFRecord" dfdl:lengthKind="implicit" ibmSchExtn:docRoot="true">
+    <xs:complexType>
+      <xs:choice>
+        <xs:element ref="smf:SMFType2">
+          <xs:annotation>
+            <xs:appinfo source="http://www.ogf.org/dfdl/">
+              <dfdl:discriminator>
+                {smf:SMFHeader/SMFHDR_Rty eq 2 and smf:SMFHeader/SMFHDR_Flag/SMFHDR_Flag1 eq 0}
+              </dfdl:discriminator>
+            </xs:appinfo>
+           </xs:annotation>
+        </xs:element>
+        <xs:element ref="smf:SMFType2Subtype1">
+          <xs:annotation>
+            <xs:appinfo source="http://www.ogf.org/dfdl/">
+              <dfdl:discriminator>
+                {smf:SMFHeader/SMFHDR_Rty eq 2 and smf:SMFHeader/SMFHDR_Flag/SMFHDR_Flag1 eq 1 and smf:SMFHeader/SMFHDR_Subtype[1]/SMFHDR_STP eq 1}
+              </dfdl:discriminator>
+            </xs:appinfo>
+           </xs:annotation>
+        </xs:element>
+        <xs:element ref="smf:SMFType2Subtype2">
+          <xs:annotation>
+            <xs:appinfo source="http://www.ogf.org/dfdl/">
+              <dfdl:discriminator>
+                {smf:SMFHeader/SMFHDR_Rty eq 2 and smf:SMFHeader/SMFHDR_Flag/SMFHDR_Flag1 eq 1 and smf:SMFHeader/SMFHDR_Subtype[1]/SMFHDR_STP eq 2}
+              </dfdl:discriminator>
+            </xs:appinfo>
+           </xs:annotation>
+        </xs:element>
+        <xs:element ref="smf:SMFType3">
+          <xs:annotation>
+            <xs:appinfo source="http://www.ogf.org/dfdl/">
+              <dfdl:discriminator>
+                {smf:SMFHeader/SMFHDR_Rty eq 3}
+              </dfdl:discriminator>
+            </xs:appinfo>
+           </xs:annotation>
+        </xs:element>
+        <xs:element ref="smf:SMFType1154">
+          <xs:annotation>
+            <xs:appinfo source="http://www.ogf.org/dfdl/">
+              <dfdl:discriminator>
+                {smf:SMFHeader/SMFHDR_Rty eq 126 and smf:SMFHeader/SMFHDR_Extension1[1]/SMFHDR1_EXT_RTY eq 1154 }
+              </dfdl:discriminator>
+            </xs:appinfo>
+           </xs:annotation>
+        </xs:element>
+        <xs:element ref="smf:SMFTypeUnknown">
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="SMFTypeUnknown" dfdl:lengthKind="prefixed" dfdl:prefixIncludesPrefixLength="yes" dfdl:prefixLengthType="smf:RecordLengthType" ibmSchExtn:docRoot="true">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="smf:SMFHeader"></xs:element>
+        <xs:element ref="smf:SMFBody" minOccurs="0" dfdl:occursCountKind="parsed"></xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="SMFType2" dfdl:lengthKind="prefixed" dfdl:prefixIncludesPrefixLength="yes" dfdl:prefixLengthType="smf:RecordLengthType" ibmSchExtn:docRoot="true">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="smf:SMFHeader"></xs:element>
+        <xs:element ref="smf:SMFBody" minOccurs="0" dfdl:occursCountKind="parsed"></xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="SMFType2Subtype1" dfdl:lengthKind="prefixed" dfdl:prefixIncludesPrefixLength="yes" dfdl:prefixLengthType="smf:RecordLengthType" ibmSchExtn:docRoot="true">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="smf:SMFHeader"></xs:element>
+        <xs:element ref="smf:SMFBody" minOccurs="0" dfdl:occursCountKind="parsed"></xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SMFType2Subtype2" dfdl:lengthKind="prefixed" dfdl:prefixIncludesPrefixLength="yes" dfdl:prefixLengthType="smf:RecordLengthType" ibmSchExtn:docRoot="true">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="smf:SMFHeader"></xs:element>
+        <xs:element ref="smf:SMFBody" minOccurs="0" dfdl:occursCountKind="parsed"></xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="SMFType3" dfdl:lengthKind="prefixed" dfdl:prefixIncludesPrefixLength="yes" dfdl:prefixLengthType="smf:RecordLengthType" ibmSchExtn:docRoot="true">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="smf:SMFHeader"></xs:element>
+        <xs:element ref="smf:SMFBody" minOccurs="0" dfdl:occursCountKind="parsed"></xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="SMFType1154" dfdl:lengthKind="prefixed" dfdl:prefixIncludesPrefixLength="yes" dfdl:prefixLengthType="smf:RecordLengthType" ibmSchExtn:docRoot="true">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="smf:SMFHeader"></xs:element>
+        <xs:element ref="smf:SMFBody" minOccurs="0" dfdl:occursCountKind="parsed"></xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <!-- Need to use 'delimited' because 'endOfParent' not supported -->
+  <!-- It works because the only in-scope 'delimiter' is the end of the SMFRecord 'box' -->
+  <xs:element name="SMFBody" type="xs:hexBinary" dfdl:encoding="iso-8859-1" dfdl:lengthKind="delimited"/>
+
+  <xs:simpleType name="RecordLengthType" dfdl:length="2" dfdl:byteOrder="bigEndian">
+    <xs:restriction base="xs:unsignedShort"/>
+  </xs:simpleType>  
+  
+  <xs:annotation>
+    <xs:appinfo source="http://www.ogf.org/dfdl/">
+      <dfdl:format encoding="{$dfdl:encoding}" ref="fmt:SMFFormat"/>
+    </xs:appinfo>
+  </xs:annotation>
+
+</xs:schema>
